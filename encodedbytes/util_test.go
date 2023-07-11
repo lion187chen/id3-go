@@ -56,12 +56,12 @@ func TestEncodeDecode(t *testing.T) {
 	expectedUTF8 := "hêllo wørld"
 
 	idx := IndexForEncoding("ISO-8859-1")
-	decoded, err := Decoders[idx].ConvertString(string(sampleISO_8859_1))
+	decoded, err := Decoders[idx].String(string(sampleISO_8859_1))
 	require.NoError(t, err)
 	assert.Equal(t, expectedUTF8, decoded)
 
 	// Try round-tripping it, and compare with original.
-	encoded, err := Encoders[idx].ConvertString(decoded)
+	encoded, err := Encoders[idx].String(decoded)
 	require.NoError(t, err)
 	assert.Equal(t, string(sampleISO_8859_1), encoded)
 }

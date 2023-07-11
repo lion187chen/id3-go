@@ -3,8 +3,8 @@ module github.com/richdawe/id3-go
 go 1.20
 
 require (
-	github.com/djimenez/iconv-go v0.0.0-20160305225143-8960e66bd3da
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/text v0.10.0
 )
 
 require (
