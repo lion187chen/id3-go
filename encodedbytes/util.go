@@ -6,7 +6,10 @@ package encodedbytes
 import (
 	"bytes"
 	"errors"
-	iconv "github.com/djimenez/iconv-go"
+
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/encoding/unicode"
 )
 
 const (
@@ -21,6 +24,9 @@ type Encoding struct {
 	NullLength int
 }
 
+// Encodings for ID3 v2 defined in:
+// https://web.archive.org/web/20170713234656/http://id3.org/id3v2-00
+// https://web.archive.org/web/20170709153222/http://id3.org/id3v2.3.0
 var (
 	EncodingMap = [...]Encoding{
 		{Name: "ISO-8859-1", NullLength: 1},
@@ -28,16 +34,26 @@ var (
 		{Name: "UTF-16BE", NullLength: 2},
 		{Name: "UTF-8", NullLength: 1},
 	}
-	Decoders = make([]*iconv.Converter, len(EncodingMap))
-	Encoders = make([]*iconv.Converter, len(EncodingMap))
+	Decoders = make([]*encoding.Decoder, len(EncodingMap))
+	Encoders = make([]*encoding.Encoder, len(EncodingMap))
 )
 
 func init() {
-	n := EncodingForIndex(NativeEncoding)
-	for i, e := range EncodingMap {
-		Decoders[i], _ = iconv.NewConverter(e.Name, n)
-		Encoders[i], _ = iconv.NewConverter(n, e.Name)
-	}
+	Decoders[0] = charmap.ISO8859_1.NewDecoder()
+	Encoders[0] = charmap.ISO8859_1.NewEncoder()
+
+	// Convertors set up according to charset definitions
+	// in <https://www.rfc-editor.org/rfc/rfc2781.html>
+	utf16 := unicode.UTF16(unicode.BigEndian, unicode.UseBOM)
+	Decoders[1] = utf16.NewDecoder()
+	Encoders[1] = utf16.NewEncoder()
+
+	utf16be := unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
+	Decoders[2] = utf16be.NewDecoder()
+	Encoders[2] = utf16be.NewEncoder()
+
+	Decoders[3] = unicode.UTF8.NewDecoder()
+	Encoders[3] = unicode.UTF8.NewEncoder()
 }
 
 // Form an integer from concatenated bits
@@ -138,12 +154,12 @@ func nullIndex(data []byte, encoding byte) (atIndex, afterIndex int) {
 }
 
 func EncodedDiff(newEncoding byte, newString string, oldEncoding byte, oldString string) (int, error) {
-	newEncodedString, err := Encoders[newEncoding].ConvertString(newString)
+	newEncodedString, err := Encoders[newEncoding].String(newString)
 	if err != nil {
 		return 0, err
 	}
 
-	oldEncodedString, err := Encoders[oldEncoding].ConvertString(oldString)
+	oldEncodedString, err := Encoders[oldEncoding].String(oldString)
 	if err != nil {
 		return 0, err
 	}

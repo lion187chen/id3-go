@@ -6,6 +6,9 @@ package encodedbytes
 import (
 	"bytes"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSynch(t *testing.T) {
@@ -30,4 +33,35 @@ func TestNorm(t *testing.T) {
 	if result := NormBytes(normResult); !bytes.Equal(result, norm) {
 		t.Errorf("encodedbytes.NormBytes(%d) = %v, want %v", normResult, result, norm)
 	}
+}
+
+func TestIndexes(t *testing.T) {
+	// Encodings, in index order
+	encodings := []string{
+		"ISO-8859-1", "UTF-16", "UTF-16BE", "UTF-8",
+	}
+	for i, e := range encodings {
+		idx := IndexForEncoding(e)
+		assert.Equal(t, byte(i), idx)
+
+		name := EncodingForIndex(byte(i))
+		assert.Equal(t, e, name)
+	}
+}
+
+// Verify that ISO-8859-1 can be decoded and encoded.
+func TestEncodeDecode(t *testing.T) {
+	// hêllo wørld (e-circumflex in hello, o-slash in world)
+	sampleISO_8859_1 := []byte{0x68, 0xea, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0xf8, 0x72, 0x6c, 0x64}
+	expectedUTF8 := "hêllo wørld"
+
+	idx := IndexForEncoding("ISO-8859-1")
+	decoded, err := Decoders[idx].String(string(sampleISO_8859_1))
+	require.NoError(t, err)
+	assert.Equal(t, expectedUTF8, decoded)
+
+	// Try round-tripping it, and compare with original.
+	encoded, err := Encoders[idx].String(decoded)
+	require.NoError(t, err)
+	assert.Equal(t, string(sampleISO_8859_1), encoded)
 }
