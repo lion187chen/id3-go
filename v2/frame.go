@@ -330,14 +330,25 @@ func ParseDescTextFrame(head FrameHead, data []byte) Framer {
 	if f.encoding, err = rd.ReadByte(); err != nil {
 		return nil
 	}
+	f.size = uint32(1)
 
 	if f.description, err = rd.ReadNullTermString(f.encoding); err != nil {
 		return nil
 	}
+	l, err := encodedbytes.EncodedNullTermStringBytes(f.description, f.encoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	if f.text, err = rd.ReadRestString(f.encoding); err != nil {
 		return nil
 	}
+	l, err = encodedbytes.EncodedStringBytes(f.text, f.encoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	return f
 }
@@ -431,18 +442,30 @@ func ParseUnsynchTextFrame(head FrameHead, data []byte) Framer {
 	if f.encoding, err = rd.ReadByte(); err != nil {
 		return nil
 	}
+	f.size = uint32(1)
 
 	if f.language, err = rd.ReadNumBytesString(3); err != nil {
 		return nil
 	}
+	f.size += uint32(3)
 
 	if f.description, err = rd.ReadNullTermString(f.encoding); err != nil {
 		return nil
 	}
+	l, err := encodedbytes.EncodedNullTermStringBytes(f.description, f.encoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	if f.text, err = rd.ReadRestString(f.encoding); err != nil {
 		return nil
 	}
+	l, err = encodedbytes.EncodedStringBytes(f.text, f.encoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	return f
 }
@@ -507,22 +530,35 @@ func ParseImageFrame(head FrameHead, data []byte) Framer {
 	if f.encoding, err = rd.ReadByte(); err != nil {
 		return nil
 	}
+	f.size = uint32(1)
 
 	if f.mimeType, err = rd.ReadNullTermString(encodedbytes.NativeEncoding); err != nil {
 		return nil
 	}
+	l, err := encodedbytes.EncodedNullTermStringBytes(f.mimeType, encodedbytes.NativeEncoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	if f.pictureType, err = rd.ReadByte(); err != nil {
 		return nil
 	}
+	f.size += uint32(1)
 
 	if f.description, err = rd.ReadNullTermString(f.encoding); err != nil {
 		return nil
 	}
+	l, err = encodedbytes.EncodedNullTermStringBytes(f.description, f.encoding)
+	if err != nil {
+		return nil
+	}
+	f.size += uint32(len(l))
 
 	if f.data, err = rd.ReadRest(); err != nil {
 		return nil
 	}
+	f.size += uint32(len(f.data))
 
 	return f
 }
