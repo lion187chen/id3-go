@@ -605,7 +605,7 @@ func (f ImageFrame) Bytes() []byte {
 		return bytes
 	}
 
-	if err = wr.WriteString(f.mimeType, encodedbytes.NativeEncoding); err != nil {
+	if err = wr.WriteNullTermString(f.mimeType, encodedbytes.NativeEncoding); err != nil {
 		return bytes
 	}
 
@@ -613,7 +613,7 @@ func (f ImageFrame) Bytes() []byte {
 		return bytes
 	}
 
-	if err = wr.WriteString(f.description, f.encoding); err != nil {
+	if err = wr.WriteNullTermString(f.description, f.encoding); err != nil {
 		return bytes
 	}
 
