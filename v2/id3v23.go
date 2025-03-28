@@ -44,8 +44,10 @@ var (
 	V23FrameTypeMap = map[string]FrameType{
 		"AENC": FrameType{id: "AENC", description: "Audio encryption", constructor: ParseDataFrame},
 		"APIC": FrameType{id: "APIC", description: "Attached picture", constructor: ParseImageFrame},
+		"CHAP": FrameType{id: "CHAP", description: "Chapter frame", constructor: nil},
 		"COMM": FrameType{id: "COMM", description: "Comments", constructor: ParseUnsynchTextFrame},
 		"COMR": FrameType{id: "COMR", description: "Commercial frame", constructor: ParseDataFrame},
+		"CTOC": FrameType{id: "CTOC", description: "Chapter table of contents", constructor: nil},
 		"ENCR": FrameType{id: "ENCR", description: "Encryption method registration", constructor: ParseDataFrame},
 		"EQUA": FrameType{id: "EQUA", description: "Equalization", constructor: ParseDataFrame},
 		"ETCO": FrameType{id: "ETCO", description: "Event timing codes", constructor: ParseDataFrame},
@@ -132,7 +134,7 @@ func ParseV23Frame(reader io.Reader) Framer {
 	id := string(bytes.Trim(data[:4], "\x00"))
 	t, ok := V23FrameTypeMap[id]
 	if !ok {
-		t = FrameType{id: id, description: "Unknown frame", constructor: ParseDataFrame}
+		return nil
 	}
 
 	size, err := encodedbytes.NormInt(data[4:8])
@@ -154,6 +156,15 @@ func ParseV23Frame(reader io.Reader) Framer {
 	frameData := make([]byte, size)
 	if n, err := io.ReadFull(reader, frameData); n < int(size) || err != nil {
 		return nil
+	}
+
+	// can't reference these from the table or they will cause an
+	// initialization loop
+	switch id {
+	case "CHAP":
+		t.constructor = ParseChapterFrame
+	case "CTOC":
+		t.constructor = ParseTOCFrame
 	}
 
 	return t.constructor(h, frameData)
