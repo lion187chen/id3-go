@@ -10,7 +10,7 @@ Supported formats:
 * ID3v2.2
 * ID3v2.3
 
-# Install
+## Install
 
 The platform ($GOROOT/bin) "go get" tool is the best method to install.
 
@@ -21,7 +21,7 @@ recompile, use "go install".
 
     go install github.com/mikkyang/id3-go
 
-# Usage
+## Usage
 
 An import allows access to the package.
 
@@ -36,7 +36,7 @@ Version specific details can be accessed through the subpackages.
         "github.com/mikkyang/id3-go/v2"
     )
 
-# Quick Start
+## Quick Start
 
 To access the tag of a file, first open the file using the package's `Open`
 function.
@@ -47,7 +47,7 @@ It's also a good idea to ensure that the file is closed using `defer`.
 
     defer mp3File.Close()
 
-## Accessing Information
+### Accessing Information
 
 Some commonly used data have methods in the tag for easier access. These
 methods are for `Title`, `Artist`, `Album`, `Year`, `Genre`, and `Comments`.
@@ -55,7 +55,7 @@ methods are for `Title`, `Artist`, `Album`, `Year`, `Genre`, and `Comments`.
     mp3File.SetArtist("Okasian")
     fmt.Println(mp3File.Artist())
 
-# ID3v2 Frames
+## ID3v2 Frames
 
 v2 Frames can be accessed directly by using the `Frame` or `Frames` method
 of the file, which return the first frame or a slice of frames as `Framer`
@@ -71,7 +71,7 @@ so.
 
     lyricsFrame := mp3File.Frame("USLT").(*v2.UnsynchTextFrame)
 
-## Adding Frames
+### Adding Frames
 
 For common fields, a frame will automatically be created with the `Set` method.
 For other frames or more fine-grained control, frames can be created with the

@@ -5,6 +5,7 @@ package encodedbytes
 
 import (
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -67,6 +68,9 @@ func (r *Reader) ReadRestString(encoding byte) (string, error) {
 		return "", err
 	}
 
+	if int(encoding) >= len(Decoders) || Decoders[encoding] == nil {
+		return "", fmt.Errorf("invalid encoding: %d", encoding)
+	}
 	return Decoders[encoding].String(string(b))
 }
 
@@ -78,8 +82,11 @@ func (r *Reader) ReadNullTermString(encoding byte) (string, error) {
 		return "", err
 	}
 
-	if -1 == atIndex {
+	if atIndex == -1 {
 		return "", errors.New("could not read null terminated string")
+	}
+	if int(encoding) >= len(Decoders) || Decoders[encoding] == nil {
+		return "", fmt.Errorf("invalid encoding: %d", encoding)
 	}
 	return Decoders[encoding].String(string(b[:atIndex]))
 }
