@@ -3,6 +3,7 @@ module github.com/lion187chen/id3-go
 go 1.20
 
 require (
+	github.com/ghenry22/id3-go v0.1.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/text v0.10.0
 )
