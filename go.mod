@@ -1,4 +1,4 @@
-module github.com/richdawe/id3-go
+module github.com/lion187chen/id3-go
 
 go 1.20
 
