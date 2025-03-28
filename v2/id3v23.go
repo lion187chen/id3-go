@@ -6,7 +6,7 @@ package v2
 import (
 	"io"
 
-	"github.com/richdawe/id3-go/encodedbytes"
+	"github.com/lion187chen/id3-go/encodedbytes"
 )
 
 var (
@@ -125,8 +125,7 @@ func ParseV23Frame(reader io.Reader) Framer {
 		return nil
 	}
 
-	id := string(data[:4])
-	t, ok := V23FrameTypeMap[id]
+	t, ok := V23FrameTypeMap[string(data[:4])]
 	if !ok {
 		return nil
 	}

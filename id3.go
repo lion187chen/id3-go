@@ -7,8 +7,8 @@ import (
 	"errors"
 	"os"
 
-	v1 "github.com/richdawe/id3-go/v1"
-	v2 "github.com/richdawe/id3-go/v2"
+	v1 "github.com/lion187chen/id3-go/v1"
+	v2 "github.com/lion187chen/id3-go/v2"
 )
 
 const (
