@@ -216,10 +216,14 @@ func NewTextFrame(ft FrameType, text string, encoding string) *TextFrame {
 		size:      uint32(1 + len(text)),
 	}
 
+	i := byte(encodedbytes.IndexForEncoding(encoding))
+	if i == 0xFF {
+		return nil
+	}
 	f := &TextFrame{
 		FrameHead: head,
 		text:      text,
-		encoding:  byte(encodedbytes.IndexForEncoding(encoding)),
+		encoding:  i,
 	}
 	f.SetEncoding(encoding)
 	return f
@@ -247,7 +251,7 @@ func (f TextFrame) Encoding() string {
 
 func (f *TextFrame) SetEncoding(encoding string) error {
 	i := byte(encodedbytes.IndexForEncoding(encoding))
-	if i < 0 {
+	if i == 0xFF {
 		return errors.New("encoding: invalid encoding")
 	}
 
@@ -351,7 +355,7 @@ func (f *DescTextFrame) SetDescription(description string) error {
 
 func (f *DescTextFrame) SetEncoding(encoding string) error {
 	i := byte(encodedbytes.IndexForEncoding(encoding))
-	if i < 0 {
+	if i == 0xFF {
 		return errors.New("encoding: invalid encoding")
 	}
 
@@ -525,7 +529,7 @@ func (f ImageFrame) Encoding() string {
 
 func (f *ImageFrame) SetEncoding(encoding string) error {
 	i := byte(encodedbytes.IndexForEncoding(encoding))
-	if i < 0 {
+	if i == 0xFF {
 		return errors.New("encoding: invalid encoding")
 	}
 
@@ -617,4 +621,22 @@ func (f ImageFrame) Bytes() []byte {
 	}
 
 	return bytes
+}
+
+func NewImageFrame(ft FrameType, mimeType string, pictureType byte, description string, data []byte) *ImageFrame {
+
+	dataFrame := NewDataFrame(ft, data)
+
+	imageFrame := &ImageFrame{
+		DataFrame:   *dataFrame,
+		encoding:    encodedbytes.NativeEncoding,
+		pictureType: pictureType,
+	}
+
+	imageFrame.SetMIMEType(mimeType)
+	if description == "" {
+		description = " "
+	}
+	imageFrame.SetDescription(description)
+	return imageFrame
 }

@@ -131,7 +131,7 @@ func IndexForEncoding(e string) byte {
 		}
 	}
 
-	return 0
+	return 0xFF
 }
 
 func nullIndex(data []byte, encoding byte) (atIndex, afterIndex int) {
