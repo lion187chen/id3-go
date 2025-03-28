@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/lion187chen/id3-go/encodedbytes"
 )
@@ -249,6 +250,14 @@ func (t Tag) Genre() string {
 	return t.textFrameText(t.commonMap["Genre"])
 }
 
+func (t Tag) Length() int {
+	length, err := strconv.ParseInt(t.textFrameText(t.commonMap["Length"]), 10, 32)
+	if err != nil {
+		return -1
+	}
+	return int(length)
+}
+
 func (t Tag) Comments() []string {
 	frames := t.Frames(t.commonMap["Comments"].Id())
 	if frames == nil {
@@ -281,6 +290,10 @@ func (t *Tag) SetYear(text string) {
 
 func (t *Tag) SetGenre(text string) {
 	t.setTextFrameText(t.commonMap["Genre"], text)
+}
+
+func (t *Tag) SetLength(length int) {
+	t.setTextFrameText(t.commonMap["Length"], fmt.Sprintf("%d", length))
 }
 
 func (t *Tag) textFrame(ft FrameType) TextFramer {

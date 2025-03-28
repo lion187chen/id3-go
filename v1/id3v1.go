@@ -83,6 +83,10 @@ func (t Tag) Genre() string {
 	return ""
 }
 
+func (t Tag) Length() int {
+	return -1
+}
+
 func (t Tag) Comments() []string {
 	return []string{t.comment}
 }
@@ -116,6 +120,10 @@ func (t *Tag) SetGenre(text string) {
 		}
 	}
 	t.dirty = true
+}
+
+func (t *Tag) SetLength(length int) {
+	// do nothing
 }
 
 func (t Tag) Bytes() []byte {

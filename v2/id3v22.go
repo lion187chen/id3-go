@@ -21,6 +21,7 @@ var (
 		"Album":    V22FrameTypeMap["TAL"],
 		"Year":     V22FrameTypeMap["TYE"],
 		"Genre":    V22FrameTypeMap["TCO"],
+		"Length":   V22FrameTypeMap["TLE"],
 		"Comments": V22FrameTypeMap["COM"],
 	}
 
