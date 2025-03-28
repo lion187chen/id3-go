@@ -211,12 +211,13 @@ type TextFrame struct {
 }
 
 func NewTextFrame(ft FrameType, text string, encoding string) *TextFrame {
+	i := byte(encodedbytes.IndexForEncoding(encoding))
+	nullLength := encodedbytes.EncodingNullLengthForIndex(i)
 	head := FrameHead{
 		FrameType: ft,
-		size:      uint32(1 + len(text)),
+		size:      uint32(1 + len(text) + nullLength),
 	}
 
-	i := byte(encodedbytes.IndexForEncoding(encoding))
 	if i == 0xFF {
 		return nil
 	}
@@ -293,7 +294,7 @@ func (f TextFrame) Bytes() []byte {
 		return bytes
 	}
 
-	if err = wr.WriteString(f.text, f.encoding); err != nil {
+	if err = wr.WriteNullTermString(f.text, f.encoding); err != nil {
 		return bytes
 	}
 
@@ -395,7 +396,7 @@ func (f DescTextFrame) Bytes() []byte {
 		return bytes
 	}
 
-	if err = wr.WriteString(f.text, f.encoding); err != nil {
+	if err = wr.WriteNullTermString(f.description, f.encoding); err != nil {
 		return bytes
 	}
 
