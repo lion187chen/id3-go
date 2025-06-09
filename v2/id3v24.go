@@ -61,6 +61,9 @@ func ParseV24Frame(reader io.Reader) Framer {
 		return nil
 	}
 
+	if t.constructor == nil {
+		return nil
+	}
 	return t.constructor(h, frameData)
 }
 
